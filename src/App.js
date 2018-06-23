@@ -5,13 +5,21 @@ import axios from 'axios';
 
 class App extends Component {
 
-  state={
-    newTodo:'',
-    editing:false,
-    editingIndex: null,
-    notification: null,
-    Todos:[]
+  constructor(){
+    super();
+
+    this.state={
+      newTodo:'',
+      editing:false,
+      editingIndex: null,
+      notification: null,
+      Todos:[]
+    }
+    this.apiUrl = 'http://5b2d89ab23b5af0014043ce4.mockapi.io' ;
+    this.changeHandler = this.changeHandler.bind(this);
   }
+  
+  
   // setting newTodo 
   handleChange = (e) =>{
     this.setState({
@@ -20,14 +28,18 @@ class App extends Component {
   }
 
   // pushing it to todos
-  changeHandler = () => {
-    const oldTodo = {
-      id: this.state.Todos.length+ 1,
-      name: this.state.newTodo
-    }
+  async changeHandler() {
+    // const oldTodo = {
+    //   id: this.state.Todos.length+ 1,
+    //   name: this.state.newTodo
+    // }
 
+    const response = await axios.post(`${this.apiUrl}/todos`, {
+      name: this.state.newTodo
+    });
+  
     const copyTodo = this.state.Todos;
-    copyTodo.push(oldTodo);
+    copyTodo.push(response.data);
 
     this.setState({
       Todos: copyTodo,
@@ -35,10 +47,12 @@ class App extends Component {
     })
   }
 
+
   // delete
-  deleteTodo = (index) => {
-    console.log(index);
+  deleteTodo = async (index) => {
     const Todos = this.state.Todos;
+    const todo = Todos[index];
+    await axios.delete(`${this.apiUrl}/todos/${todo.id}`)
     delete Todos[index];
     this.setState({Todos})
     this.alert("Deleted Successfully")
@@ -55,15 +69,18 @@ class App extends Component {
     console.log(this.state.editingIndex);
   }
  // update 
- updateTodo = () => {
+ updateTodo = async () => {
    const todo= this.state.Todos[this.state.editingIndex];
    todo.name = this.state.newTodo;
+   const response = await axios.put(`${this.apiUrl}/todos/${todo.id}`, {name: this.state.newTodo})
     const Todos = this.state.Todos;
-    Todos[this.state.editingIndex] = todo;
-    console.log(Todos[this.state.editingIndex]);
-   this.setState({ Todos,
-    editing: false, 
-    editingIndex: null
+    Todos[this.state.editingIndex] = response.data;
+  
+   this.setState({ 
+      Todos,
+      editing: false, 
+      editingIndex: null,
+      newTodo: ""
   })
   this.alert('Todo Updated Successfully')
  }
@@ -76,9 +93,8 @@ class App extends Component {
  }
 
 async componentDidMount(){
-  const res = await axios.get('http://5b2d89ab23b5af0014043ce4.mockapi.io/todos');
+  const res = await axios.get(`${this.apiUrl}/todos`);
   console.log(res);
-
   this.setState({
     Todos: res.data
   })
