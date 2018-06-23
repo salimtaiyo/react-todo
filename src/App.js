@@ -8,6 +8,7 @@ class App extends Component {
     newTodo:'',
     editing:false,
     editingIndex: null,
+    notification: null,
     Todos:[
       {id:1,
       name:'play doto'
@@ -48,10 +49,8 @@ class App extends Component {
     console.log(index);
     const Todos = this.state.Todos;
     delete Todos[index];
-    this.setState({
-      Todos,
-
-    })
+    this.setState({Todos})
+    this.alert("Deleted Successfully")
   }
 
   // edit
@@ -75,13 +74,36 @@ class App extends Component {
     editing: false, 
     editingIndex: null
   })
+  this.alert('Todo Updated Successfully')
+ }
+
+ // alert 
+ alert = (notification) => {
+   this.setState({notification})
+   setTimeout(() => {this.setState({notification: null})}, 3000)
+    
+ }
+
+ // api call
+ getData = () => {
+   fetch(`http://5b2d89ab23b5af0014043ce4.mockapi.io/todos`)
+   .then(data => data.json())
+   console.log(data);
+   
  }
 
   render() {
     return (
       <div className="App">
         <div className="container">
-
+        <button onClick={this.getData}> Click </button>
+        {
+          this.state.notification &&
+            <div className="alert alert-success">
+              <p className="text-center"> {this.state.notification}</p>
+            </div>
+        }
+        
         <input 
           type="text" 
           className="m-4 form-control" 
