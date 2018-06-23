@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import ListItem from './ListItem';
+import axios from 'axios';
 
 class App extends Component {
 
@@ -9,17 +10,7 @@ class App extends Component {
     editing:false,
     editingIndex: null,
     notification: null,
-    Todos:[
-      {id:1,
-      name:'play doto'
-      },
-      {id:2,
-      name:'play doto'
-      },
-      {id:3,
-      name:'play doto'
-      }
-    ]
+    Todos:[]
   }
   // setting newTodo 
   handleChange = (e) =>{
@@ -84,13 +75,16 @@ class App extends Component {
     
  }
 
- // api call
- getData = () => {
-   fetch(`http://5b2d89ab23b5af0014043ce4.mockapi.io/todos`)
-   .then(data => data.json())
-   console.log(data);
-   
- }
+async componentDidMount(){
+  const res = await axios.get('http://5b2d89ab23b5af0014043ce4.mockapi.io/todos');
+  console.log(res);
+
+  this.setState({
+    Todos: res.data
+  })
+}
+  
+
 
   render() {
     return (
