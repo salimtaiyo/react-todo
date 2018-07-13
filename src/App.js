@@ -13,7 +13,8 @@ class App extends Component {
       editing:false,
       editingIndex: null,
       notification: null,
-      Todos:[]
+      Todos:[],
+      loading: true
     }
     this.apiUrl = 'http://5b2d89ab23b5af0014043ce4.mockapi.io' ;
     this.changeHandler = this.changeHandler.bind(this);
@@ -96,7 +97,8 @@ async componentDidMount(){
   const res = await axios.get(`${this.apiUrl}/todos`);
   console.log(res);
   this.setState({
-    Todos: res.data
+    Todos: res.data,
+    loading:false
   })
 }
   
@@ -126,10 +128,15 @@ async componentDidMount(){
           <button 
             className="btn-info mb-3 form-control"
             onClick={ this.state.editing? this.updateTodo: this.changeHandler}> 
-            {this.state.editing? "Update": "Add"} </button>
+            {this.state.editing? "Update": "Add"}
+          </button>
+
+          {
+            this.state.loading && <h1> Loading </h1>
+          }
 
           { 
-            !this.state.editing && 
+            (!this.state.editing || this.state.loading) && 
               <ul className="list-group">
                 {this.state.Todos.map( (i,index) => {
                   return <ListItem 
